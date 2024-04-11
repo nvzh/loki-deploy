@@ -1,0 +1,68 @@
+# https://github.com/mingrammer/flog
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: flog-pv
+#   namespace: flog
+# spec:
+#   capacity:
+#     storage: 15Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /var/log
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: flog-pvc
+#   namespace: flog
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 15Gi
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nvzh-flog-deploy
+  namespace: flog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      iam: nvzh
+  template:
+    metadata:
+      labels:
+        iam: nvzh
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8spgwk03
+      containers:
+      - name: nvzh-flog-container
+        image: mingrammer/flog:latest
+        command: 
+          - flog
+        args: 
+          # - '-t'
+          # - 'log'
+          - '--loop'
+          - '--delay'
+          - '1s'
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      #   volumeMounts:
+      #   - name: flog-volume
+      #     mountPath: /var/log
+      # volumes:
+      # - name: flog-volume
+      #   persistentVolumeClaim:
+      #     claimName: flog-pvc
