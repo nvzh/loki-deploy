@@ -1,0 +1,21 @@
+name: Deploy Loki to personal repo
+
+on:
+  push:
+    branches:
+      - loki-local-test
+
+jobs:
+  deploy:
+    runs-on: self-hosted # [issue 1] can't use any available runners
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Create namespace
+      uses: actions-hub/kubectl@v1.29.1
+      env:
+        KUBE_CONFIG: ${{ secrets.LOKI_CONFIG }}
+      with:
+        args: get ns
